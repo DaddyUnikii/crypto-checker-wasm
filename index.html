@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crypto Checker (WASM)</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1e1e2f; color: #fff; }
+        h1 { color: #00ffcc; }
+        .coin { margin: 15px 0; }
+        .coin span { display: inline-block; width: 100px; }
+    </style>
+</head>
+<body>
+    <h1>💰 Crypto Checker (Rust + WASM)</h1>
+    <div id="results"></div>
+
+    <script type="module">
+        import init, { get_crypto_price } from './pkg/crypto_checker_wasm.js';
+
+        async function fetchPrices() {
+            await init();
+            const results = document.getElementById('results');
+            results.innerHTML = '';
+
+            const coins = ['bitcoin', 'ethereum', 'binance-coin'];
+            for (const coin of coins) {
+                try {
+                    const price = await get_crypto_price(coin);
+                    const coinDiv = document.createElement('div');
+                    coinDiv.className = 'coin';
+                    coinDiv.innerHTML = `<span>${coin.toUpperCase()}</span> $${price.toFixed(2)}`;
+                    results.appendChild(coinDiv);
+                } catch (e) {
+                    console.error(`Error fetching ${coin}:`, e);
+                }
+            }
+        }
+
+        fetchPrices();
+        setInterval(fetchPrices, 60000); // Refresh setiap 1 menit
+    </script>
+</body>
+</html>
